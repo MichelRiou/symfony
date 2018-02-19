@@ -2,6 +2,7 @@
 
 namespace AppBundle\Controller;
 
+use AppBundle\Entity\Contact;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Request;
@@ -53,9 +54,28 @@ class DefaultController extends Controller
     public function fruitAction ()
     {
         $fruit= array("Pomme","Poire","Cerise");
+        $food=[
+            ["name"=>"Pommes","type"=>"fruit","edible"=>true],
+            ["name"=>"Radis","type"=>"légume","edible"=>true],
+            ["name"=>"Chromium","type"=>"métal","edible"=>false],
+            ["name"=>"Canard","type"=>"viande","edible"=>true],
+            ["name"=>"Kebab","type"=>"plat","edible"=>false],
+        ];
 
+        return $this->render("fruits.html.twig",["fruitList"=>$fruit,"foodList"=>$food]);
 
-        return $this->render("fruits.html.twig",["fruitList"=>$fruit]);
+    }
 
+    /**
+     * @Route("/new-contact", name="new_contactpage" )
+     */
+    public function newContactAction(){
+        $contact= new Contact();
+        $contact->setName("Hugo")->setFirstName("victor")->setEmail('vh@mail6.com')->setDateOfbirth(new \DateTime("1865-05-12"));
+        // Récupération du gestionnaire d'entité
+        $em=$this->getDoctrine()->getManager();
+        $em->persist($contact);
+        $em->flush();
+        return $this->render("default/new-contact.html.twig",["contact"=>$contact]);
     }
 }
