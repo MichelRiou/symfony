@@ -1,0 +1,11 @@
+{% extends 'base_layout_html.twig' %}
+
+{% block content %}
+    <h1>{{ article.title }}</h1>
+
+
+    <h3> {{ article.category }}</h3>
+    <p>{{ article.validated?"Validé":"Non validé" }}</p>
+
+    <a class="btn btn-primary" href="{{ path('article_list') }}" role="button">Retour List</a>
+{% endblock %}
