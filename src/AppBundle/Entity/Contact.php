@@ -8,7 +8,7 @@ use Doctrine\ORM\Mapping\Index;
 /**
  * Contact
  *
- * @ORM\Table(name="contact",
+ * @ORM\Table(name="contacts",
  *     indexes={
  *     @Index(name="idx_name",columns={"name"})
  *      }
@@ -182,5 +182,14 @@ class Contact
     {
         return $this->dateOfbirth;
     }
-}
 
+    /**
+     * Get active
+     *
+     * @return boolean
+     */
+    public function getActive()
+    {
+        return $this->active;
+    }
+}

@@ -2,6 +2,7 @@
 
 namespace AppBundle\Entity;
 
+use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
@@ -9,6 +10,7 @@ use Doctrine\ORM\Mapping as ORM;
  *
  * @ORM\Table(name="articles")
  * @ORM\Entity(repositoryClass="AppBundle\Repository\ArticleRepository")
+ * @ORM\HasLifecycleCallbacks()
  */
 class Article
 {
@@ -28,11 +30,49 @@ class Article
      * @ORM\Column(name="title", type="string", length=255)
      */
     private $title;
+    /**
+     * @var \DateTime
+     */
+    private $createdAt;
+    /**
+     * @var \DateTime
+     */
+    private $updatedAt;
 
     /**
-     * @var string
+     * @return \DateTime
+     */
+    public function getCreatedAt()
+    {
+        return $this->createdAt;
+    }
+
+    /**
+     * @return \DateTime
+     */
+    public function getUpdatedAt()
+    {
+        return $this->updatedAt;
+    }
+    // Persistance c'est la cration de l'entité
+    /**
+     * @ORM\PrePersist()
+     */
+    public function prePersistEvent(){
+        $this->createdAt=new \DateTime();
+    }
+
+    /**
+     * @ORM\PreUpdate()
+     * @ORM\PrePersist()
+     */
+    Public function preUpdateEvent(){
+        $this->updatedAt= new \DateTime;
+    }
+    /**
+     * @var Category
      *
-     * @ORM\Column(name="category", type="string", length=30)
+     * @ORM\ManyToOne(targetEntity="AppBundle\Entity\Category",inversedBy="articles")
      */
     private $category;
 
@@ -42,11 +82,23 @@ class Article
      * @ORM\Column(name="validated", type="boolean")
      */
     private $validated;
+    //                      INVERSED to the MANY SIDE
+    /**
+     * @var Author
+     * @ORM\ManyToOne(targetEntity="AppBundle\Entity\Author",inversedBy="articles")
+     */
+    private $author;
+    /**
+     * @var ArrayCollection
+     * @ORM\ManyToMany(targetEntity="AppBundle\Entity\Tags",cascade={"persist"})
+     */
+    private $tags;
+
 
     /**
      * Article constructor.
      * @param string $title
-     * @param string $category
+     * @param Category $category
      * @param bool $validated
      */
     public function __construct($title, $category, $validated)
@@ -91,29 +143,6 @@ class Article
         return $this->title;
     }
 
-    /**
-     * Set category
-     *
-     * @param string $category
-     *
-     * @return Article
-     */
-    public function setCategory($category)
-    {
-        $this->category = $category;
-
-        return $this;
-    }
-
-    /**
-     * Get category
-     *
-     * @return string
-     */
-    public function getCategory()
-    {
-        return $this->category;
-    }
 
     /**
      * Set validated
@@ -130,6 +159,24 @@ class Article
     }
 
     /**
+     * @return Category
+     */
+    public function getCategory()
+    {
+        return $this->category;
+    }
+
+    /**
+     * @param Category $category
+     * @return Article
+     */
+    public function setCategory($category)
+    {
+        $this->category = $category;
+        return $this;
+    }
+
+    /**
      * Get validated
      *
      * @return bool
@@ -138,5 +185,62 @@ class Article
     {
         return $this->validated;
     }
-}
 
+    /**
+     * Set author
+     *
+     * @param \AppBundle\Entity\Author $author
+     *
+     * @return Article
+     */
+    public function setAuthor(\AppBundle\Entity\Author $author = null)
+    {
+        $this->author = $author;
+
+        return $this;
+    }
+
+    /**
+     * Get author
+     *
+     * @return \AppBundle\Entity\Author
+     */
+    public function getAuthor()
+    {
+        return $this->author;
+    }
+
+    /**
+     * Add tag
+     *
+     * @param \AppBundle\Entity\Tags $tag
+     *
+     * @return Article
+     */
+    public function addTag(\AppBundle\Entity\Tags $tag)
+    {
+        $this->tags[] = $tag;
+
+        return $this;
+    }
+
+    /**
+     * Remove tag
+     *
+     * @param \AppBundle\Entity\Tags $tag
+     */
+    public function removeTag(\AppBundle\Entity\Tags $tag)
+    {
+        $this->tags->removeElement($tag);
+    }
+
+    /**
+     * Get tags
+     *
+     * @return \Doctrine\Common\Collections\Collection
+     */
+    public function getTags()
+    {
+        return $this->tags;
+    }
+}
