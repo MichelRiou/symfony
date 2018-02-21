@@ -4,7 +4,7 @@ namespace AppBundle\Entity;
 
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping as ORM;
-
+use Symfony\Component\Validator\Constraints as Assert;
 /**
  * Author
  *
@@ -24,7 +24,10 @@ class Author
 
     /**
      * @var string
-     *
+     * @Assert\NotBlank(message="Le nom ne peut être nul")
+     * @Assert\Length(max="50",min="3",
+     *     maxMessage="Le nom ne peut depasser {{limit}}) caractères",
+     *     minMessage="Le nom doit comporter au moins {{limit}}")
      * @ORM\Column(name="name", type="string", length=50, unique=true)
      */
     private $name;
@@ -43,6 +46,8 @@ class Author
     private $articles;
     /**
      * @var Nationality
+     * @Assert\Type(type="Nationality",message="La nationalité doit être de type nationalité")
+     * @Assert\NotNull(message="Un auteur doit avoir une nationalité")
      * @ORM\ManyToOne(targetEntity="AppBundle\Entity\Nationality")
      */
     private $nationality;

@@ -69,6 +69,7 @@ class DefaultController extends Controller
 
     /**
      * @Route("/new-contact", name="new_contactpage" )
+     *
      */
     public function newContactAction()
     {
@@ -98,21 +99,23 @@ class DefaultController extends Controller
     }
 
     /**
-     * @Route("/article-list/page-{page}/{category}",
-     *     defaults={"category"="all","page"=1},
+     * @Route("/article-list/page-{page}/{categoryName}",
+     *     defaults={"categoryName"="all","page"=1},
      *     requirements={"page"="\d+"},
      *     name="article_list")
      */
-    public function showArticleAction($category, $page)
+    public function showArticleAction($categoryName, $page)
     {
         $repository = $this->getDoctrine()->getRepository("AppBundle:Article");
-        $nbArticlePerPage = 2;
-        if ($category == "all") {
+        $nbArticlePerPage = 10;
+        if ($categoryName == "all") {
             // $articleList = $repository->findAll(['title'=>'ASC']); A voir pourquoi it doesn't work
             $articleList = $repository->findBy([], ['title' => 'ASC']);
 
         } else {
-            $articleList = $repository->findByCategory($category, ['title' => 'ASC']);
+            $categoryRepository=$this->getDoctrine()->getRepository("AppBundle:Category");
+            $category=$categoryRepository->findByName($categoryName);
+            $articleList = $repository->findByCategory($category, ['category' => 'ASC']);
 
         }
         $nbArticles = count($articleList);
@@ -123,7 +126,7 @@ class DefaultController extends Controller
             "articleList" => $articleList,
             "nbPages" => $nbPages,
             "currentPage" => $page,
-            "category" => $category
+            "category" => $categoryName
         ]);
 
     }

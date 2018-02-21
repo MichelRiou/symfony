@@ -4,6 +4,7 @@ namespace AppBundle\Entity;
 
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Validator\Constraints as Assert;
 
 /**
  * Article
@@ -26,7 +27,10 @@ class Article
 
     /**
      * @var string
-     *
+     * @Assert\NotNull(message="Le titre ne peut être nul")
+     * @Assert\Length(max="255",min="30",
+     *     maxMessage="Le titre ne peut faire plus de {{ limit }} caractères",
+     *     minMessage="Le titre doit faire plus de {{ limit }} caractères")
      * @ORM\Column(name="title", type="string", length=255)
      */
     private $title;
@@ -86,10 +90,14 @@ class Article
     /**
      * @var Author
      * @ORM\ManyToOne(targetEntity="AppBundle\Entity\Author",inversedBy="articles")
+     * @Assert\Valid()
      */
     private $author;
     /**
      * @var ArrayCollection
+     * @Assert\Count(min="1",max="5",
+     *     minMessage="Il faut au moins {{ limit }} tag",
+     *     maxMessage="Pas plus de {{ limit }} messages")
      * @ORM\ManyToMany(targetEntity="AppBundle\Entity\Tags",cascade={"persist"})
      */
     private $tags;
@@ -101,11 +109,9 @@ class Article
      * @param Category $category
      * @param bool $validated
      */
-    public function __construct($title, $category, $validated)
+    public function __construct()
     {
-        $this->title = $title;
-        $this->category = $category;
-        $this->validated = $validated;
+        $this->tags= new ArrayCollection();
     }
 
 
@@ -243,4 +249,15 @@ class Article
     {
         return $this->tags;
     }
+
+    /**
+     * @param \DateTime $createdAt
+     * @return Article
+     */
+    public function setCreatedAt($createdAt)
+    {
+        $this->createdAt = $createdAt;
+        return $this;
+    }
+
 }
